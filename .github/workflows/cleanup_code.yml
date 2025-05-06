@@ -51,7 +51,8 @@ jobs:
           for exception in exceptions:
             gitignore.write_text(gitignore.read_text() + "\n" + exception)
 
-      - uses: psf/black@stable
+      # newline ending hazzles
+      #- uses: psf/black@stable
 
       - name: if dirty files, commit them again (careful with recursion)
         run: |
