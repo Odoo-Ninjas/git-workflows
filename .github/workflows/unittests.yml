@@ -22,11 +22,15 @@ jobs:
       cancel-in-progress: true
 
     steps:
+      - name: Welcome robotests
+        run: |
+          echo "Welcome to robotesting"
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v6
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v8
         with:
           enabled: ${{ inputs.enabled }}
           build: ${{ inputs.enabled }}

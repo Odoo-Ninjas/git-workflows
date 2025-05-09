@@ -58,7 +58,7 @@ runs:
         while (( attempt <= max_attempts ))
         do
             if $HOME/.local/bin/gimera apply -f -r -C -v -P -I; then
-              echo "Success on attempt $attempt!"
+              echo "Success on attempt $attempt! Congrats."
               exit 0  # Exit script if the command is successful
             else
               echo "Failure on attempt $attempt."
@@ -94,16 +94,12 @@ runs:
         chmod a+x odoobin
         echo "Creating local odoo bin"
 
-    - name: get python version
-      id: python_version
-      uses: Odoo-Ninjas/git-workflows/actions/parse_python_version@v6
-
     - name: reload
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash
       run: |
         echo "Reloading odoo with settings"
-        ODOO_PYTHON_VERSION="${{ steps.python_version.outputs.python_version }}"
+        ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
         ./odoobin setting -R DEVMODE 1
         ./odoobin setting -R RUN_ROBOT 1
         ./odoobin setting -R RUN_MAIL 0
@@ -123,5 +119,5 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash
       run: |
-        ./odoobin down || true
-        ./odoobin down
+        ./odoobin -f down || true
+        ./odoobin -f down

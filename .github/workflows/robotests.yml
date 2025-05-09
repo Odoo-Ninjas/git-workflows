@@ -27,12 +27,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v6
-        with:
-          enabled: ${{ inputs.enabled }}
-          build: ${{ inputs.enabled }}
-          project_name_prefix: ${{ inputs.projectname}}_robotests
+      # - name: preparation steps
+      #   uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v8
+      #   with:
+      #     build: ${{ inputs.enabled }}
+      #     enabled: ${{ inputs.enabled }}
+      #     project_name_prefix: ${{ inputs.projectname}}_robotests
 
       - name: run robo tests
         if: ${{ inputs.enabled }}
