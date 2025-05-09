@@ -1,0 +1,51 @@
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows
+name: Run Unittests for repository
+
+permissions: write-all
+
+on:
+  workflow_call:
+    inputs:
+      ENABLED:
+        required: true
+        type: string
+jobs:
+  run_tests:
+    runs-on:
+      - self-hosted
+      # - marc-laptop
+    concurrency:
+      group: unittests-${{ github.workflow }}-${{ github.ref }}-unittests
+      cancel-in-progress: true
+    env:
+      DO_TESTING: ${{ inputs.ENABLED }} 
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setenv var
+        shell: bash
+        run: echo "DO_TESTING=$DO_TESTING" >> "$GITHUB_ENV"
+
+      - name: preparation steps
+        uses: ./.github/actions/prepare_repo
+        with:
+          enabled: ${{ env.DO_TESTING }}
+          build: ${{ env.DO_TESTING }}
+          project_name_prefix: unittests
+
+      - name: run tests
+        if: env.DO_TESTING == '1'
+        run: |
+          ./odoobin up -d postgres || true
+          ./odoobin up -d postgres
+          ./odoobin -f run-tests
+
+      - name: cleanup docker
+        if: always()
+        run: |
+          if  [ -e "$DO_TESTING" "1" ]; then
+            ./odoobin -f kill
+            ./odoobin -f down -v
+          fi

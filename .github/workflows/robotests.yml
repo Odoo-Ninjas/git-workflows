@@ -1,0 +1,51 @@
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows
+name: Run Robotests for repository
+
+permissions: write-all
+
+on:
+  workflow_call:
+    inputs:
+      ENABLED:
+        required: true
+        type: string
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-robotests
+      cancel-in-progress: true
+
+    env:
+      DO_TESTING: ${{ inputs.ENABLED }} 
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setenv var
+        shell: bash
+        run: echo "DO_TESTING=$DO_TESTING" >> "$GITHUB_ENV"
+
+      - name: preparation steps
+        uses: ./.github/actions/prepare_repo
+        with:
+          enabled: ${{ env.DO_TESTING }}
+          build: ${{ env.DO_TESTING }}
+          project_name_prefix: robotests
+
+      - name: run robo tests
+        if: env.DO_TESTING == '1'
+        run: |
+          ./odoobin -f robot run-all --timeout $ROBO_TIMEOUT
+
+      - name: cleanup docker
+        if: always()
+        run: |
+          if  [ "$DO_TESTING" = "1" ]; then
+            ./odoobin -f kill || true
+            ./odoobin -f down -v || true
+          fi
