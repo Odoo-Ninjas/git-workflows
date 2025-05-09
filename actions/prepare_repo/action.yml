@@ -17,6 +17,7 @@ inputs:
 env:
   GIMERA_NON_THREADED: 1
   GIMERA_NON_INTERACTIVE: 1
+  GIMERA_NO_PRECOMMIT: 1
 
 runs:
   using: "composite"
