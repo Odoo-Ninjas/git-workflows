@@ -17,8 +17,6 @@ jobs:
     concurrency:
       group: unittests-${{ github.workflow }}-${{ github.ref }}-unittests
       cancel-in-progress: true
-    env:
-      DO_TESTING: ${{ inputs.ENABLED }} 
 
     steps:
       - name: Checkout

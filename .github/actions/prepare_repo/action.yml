@@ -1,0 +1,117 @@
+name: "prepare repo actions"
+description: "creates ./odoobin to execute with current project name"
+
+inputs:
+  enabled:
+    type: boolean
+    default: true
+    required: false
+  project_name_prefix:
+    type: string
+    required: true
+  build:
+    type: boolean
+    default: "1"
+    required: false
+
+env:
+  GIMERA_NON_THREADED: 1
+  GIMERA_NON_INTERACTIVE: 1
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: setup gimera and wodoo
+      shell: bash
+      run: |
+        pipx install wodoo --force || true
+        pipx install gimera --force || true
+        pipx upgrade wodoo || true
+        pipx upgrade gimera || true
+
+    - name: fetch missing repos
+      if: ${{ inputs.enabled }}
+      shell: bash
+      run: |
+        set -ex
+
+        rm .gitignore
+
+        max_attempts=10
+        attempt=1
+        random_wait_time=$(( (RANDOM % 30) + 1 ))
+
+        # always update robots
+        rm -Rf addons_robot || true
+
+
+        while (( attempt <= max_attempts ))
+        do
+            if $HOME/.local/bin/gimera apply -f -r -C -v -P -I; then
+              echo "Success on attempt $attempt!"
+              exit 0  # Exit script if the command is successful
+            else
+              echo "Failure on attempt $attempt."
+            fi
+            ((attempt++))
+            sleep "$random_wait_time"
+        done
+
+    - name: local odoo bin
+      if: ${{ inputs.enabled }}
+      shell: bash
+      run: |
+        python3 <<EOF
+
+        from pathlib import Path
+        import os
+        import hashlib
+
+        project_name = 'zynctesting_${{ inputs.project_name_prefix}}_${GITHUB_REF#refs/heads/}'
+        for c in ' :;*&^%$"\'[]{}-.,':
+          project_name = project_name.replace(c, "_")
+        #projectname too long probably
+        project_name = hashlib.sha256(project_name.encode()).hexdigest()[:20]
+
+        content = []
+        content.append("#!/bin/bash")
+        content.append(f'$HOME/.local/bin/odoo -p {project_name} "\$@"')
+        Path("odoobin").write_text('\n'.join(content))
+
+        EOF
+        chmod a+x odoobin
+
+    - name: get python version
+      id: python_version
+      uses: ./.github/actions/parse_python_version
+
+    - name: reload
+      if: ${{ inputs.enabled && inputs.build }}
+      shell: bash
+      run: |
+        ODOO_PYTHON_VERSION="${{ steps.python_version.outputs.python_version }}"
+        ./odoobin setting -R DEVMODE 1
+        ./odoobin setting -R RUN_ROBOT 1
+        ./odoobin setting -R RUN_MAIL 0
+        ./odoobin setting -R ODOO_PYTHON_VERSION "$ODOO_PYTHON_VERSION"
+        ./odoobin setting -R RUN_PROXY_PUBLISHED=0
+        ./odoobin setting -R RUN_PROXY_PORT 0
+        ./odoobin reload --demo
+
+    - name: build docker images
+      if: ${{ inputs.enabled && inputs.build }}
+      shell: bash
+      run: |
+        ./odoobin build -rm
+
+    - name: downing
+      if: ${{ inputs.enabled && inputs.build }}
+      shell: bash
+      run: |
+        ./odoobin down || true
+        ./odoobin down
