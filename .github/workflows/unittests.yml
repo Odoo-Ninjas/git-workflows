@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: ./.github/actions/prepare_repo
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v6
         with:
           enabled: ${{ inputs.ENABLED }}
           build: ${{ inputs.ENABLED }}
