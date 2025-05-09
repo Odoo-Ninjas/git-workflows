@@ -6,7 +6,10 @@ permissions: write-all
 on:
   workflow_call:
     inputs:
-      ENABLED:
+      projectname:
+        type: string
+        required: true
+      enabled:
         required: true
         type: string
 jobs:
@@ -25,12 +28,12 @@ jobs:
       - name: preparation steps
         uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v6
         with:
-          enabled: ${{ inputs.ENABLED }}
-          build: ${{ inputs.ENABLED }}
-          project_name_prefix: unittests
+          enabled: ${{ inputs.enabled }}
+          build: ${{ inputs.enabled }}
+          project_name_prefix: ${{ inputs.projectname}}_unittests
 
       - name: run tests
-        if: ${{ inputs.ENABLED }}
+        if: ${{ inputs.enabled }}
         run: |
           ./odoobin up -d postgres || true
           ./odoobin up -d postgres
@@ -39,7 +42,7 @@ jobs:
       - name: cleanup docker
         if: always()
         run: |
-          if  [ "${{ inputs.ENABLED }}" == "true" ]; then
+          if "${{ inputs.ENABLED }}"; then
             ./odoobin -f kill
             ./odoobin -f down -v
           fi

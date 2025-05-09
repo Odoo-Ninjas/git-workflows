@@ -1,8 +1,9 @@
 name: "parse python version"
-description: identify the python version
+description: "Identify the Python version from MANIFEST"
 
 outputs:
   python_version:
+    description: "The Python version from MANIFEST"
     value: ${{ steps.read_file.outputs.python_version }}
 
 runs:
@@ -12,13 +13,7 @@ runs:
       id: read_file
       shell: bash
       run: |
-        python3 <<EOF
-        from pathlib import Path
-        import os
-        python_version = str(eval(Path("MANIFEST").read_text())['python_version'])
-
-        file = Path(os.environ['GITHUB_OUTPUT'])
-        content = file.read_text()
-        content += f"\npython_version={python_version}\n"
-        file.write_text(content)
-        EOF
+        echo "reading python version from MANIFEST"
+        python_version=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
+        echo "python_version=$python_version" >> "$GITHUB_OUTPUT"
+        echo "Done getting the python version"

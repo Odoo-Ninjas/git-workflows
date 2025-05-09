@@ -6,7 +6,10 @@ permissions: write-all
 on:
   workflow_call:
     inputs:
-      ENABLED:
+      projectname:
+        type: string
+        required: true
+      enabled:
         required: false
         type: boolean
         default: true
@@ -27,19 +30,19 @@ jobs:
       - name: preparation steps
         uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v6
         with:
-          enabled: ${{ inputs.ENABLED }}
-          build: ${{ inputs.ENABLED }}
-          project_name_prefix: robotests
+          enabled: ${{ inputs.enabled }}
+          build: ${{ inputs.enabled }}
+          project_name_prefix: ${{ inputs.projectname}}_robotests
 
       - name: run robo tests
-        if: ${{ inputs.ENABLED }}
+        if: ${{ inputs.enabled }}
         run: |
           ./odoobin -f robot run-all --timeout $ROBO_TIMEOUT
 
       - name: cleanup docker
         if: always()
         run: |
-          if  [ "${{ inputs.ENABLED }}" == "true" ]; then
+          if "${{ inputs.enabled }}"; then
             ./odoobin -f kill || true
             ./odoobin -f down -v || true
           fi
