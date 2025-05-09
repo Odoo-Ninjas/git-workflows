@@ -14,9 +14,7 @@ runs:
         python3 <<EOF
         from pathlib import Path
         import os
-        version = str(eval(Path("MANIFEST").read_text())['version'])
-        res = eval(Path("./.github/workflows/python_versions.txt").read_text())
-        python_version = res[version]
+        python_version = str(eval(Path("MANIFEST").read_text())['python_version'])
 
         file = Path(os.environ['GITHUB_OUTPUT'])
         content = file.read_text()
