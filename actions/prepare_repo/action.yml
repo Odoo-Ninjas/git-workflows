@@ -50,6 +50,10 @@ runs:
         # always update robots
         rm -Rf addons_robot || true
 
+        # remove pre commit config
+        rm .pre-commit-config.yaml || true
+        git add .pre-commit-config.yaml || true
+        git commit -m 'removed precommit'
 
         while (( attempt <= max_attempts ))
         do
