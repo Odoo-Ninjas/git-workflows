@@ -33,7 +33,8 @@ jobs:
 
     - name: setup ssh
       run: |
-        mkdir ~/.ssh || exit 0
+        mkdir -p ~/.ssh || exit 0
+        chmod 600 ~/.ssh/id_rsa
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 400 ~/.ssh/id_rsa
         chmod 500 ~/.ssh
@@ -96,12 +97,20 @@ jobs:
         SRCBRANCH = "${{ inputs.source_branch }}"
         branches = "${{ inputs.branches }}"
 
+        print(f"Checking branches of SRCBRANCH: {SRCBRANCH} and branches: {branches}")
+
         for area in branches.split("|||"):
           area = area.strip()
           error = False
 
           for branch in area.split(" "):
-            dest, source = branch.strip().split(":")
+            branch = branch.strip()
+            if not branch:
+              continue
+            try:
+              dest, source = branch.strip().split(" ")
+            except:
+              raise Exception(f"Invalid format: {branch}")
             dest = dest.strip()
             source = source.strip()
             print(f"Source is: {source}, dest is: {dest}")
@@ -109,6 +118,8 @@ jobs:
             try:
               env = deepcopy(os.environ)
               env['GH_TOKEN'] = "${{ github.token }}"
+              if not env["GH_TOKEN"]:
+                raise Exception("GH TOKEN missing")
               subprocess.check_call(["/bin/bash", "/tmp/rebase.sh", source, dest], env=env)
             except:
               error = True

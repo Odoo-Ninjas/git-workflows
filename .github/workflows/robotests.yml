@@ -7,8 +7,9 @@ on:
   workflow_call:
     inputs:
       ENABLED:
-        required: true
-        type: string
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -26,26 +27,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setenv var
-        shell: bash
-        run: echo "DO_TESTING=$DO_TESTING" >> "$GITHUB_ENV"
-
       - name: preparation steps
         uses: ./.github/actions/prepare_repo
         with:
-          enabled: ${{ env.DO_TESTING }}
-          build: ${{ env.DO_TESTING }}
+          enabled: ${{ inputs.ENABLED }}
+          build: ${{ inputs.ENABLED }}
           project_name_prefix: robotests
 
       - name: run robo tests
-        if: env.DO_TESTING == '1'
+        if: ${{ inputs.ENABLED }}
         run: |
           ./odoobin -f robot run-all --timeout $ROBO_TIMEOUT
 
       - name: cleanup docker
         if: always()
         run: |
-          if  [ "$DO_TESTING" = "1" ]; then
+          if  [ "${{ inputs.ENABLED }}" == "true" ]; then
             ./odoobin -f kill || true
             ./odoobin -f down -v || true
           fi
