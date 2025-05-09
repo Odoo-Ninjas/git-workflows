@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: ./actions/prepare_repo
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
