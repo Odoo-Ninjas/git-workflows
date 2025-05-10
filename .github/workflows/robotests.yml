@@ -15,7 +15,7 @@ on:
         default: true
       timeout:
         required: false
-        type: int
+        type: number
         default: 140
 
 jobs:
