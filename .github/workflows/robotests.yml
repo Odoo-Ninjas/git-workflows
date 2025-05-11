@@ -44,11 +44,13 @@ jobs:
       - name: run robo tests for (if empty then all) ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
         run: |
-          if ${{ inputs.testfile }}; then
+          if [[ ! -z "${{ inputs.testfile }};" ]] then
+            echo "Running unittest for ${{ inputs.testfile }};"
             ./odoobin -f reload --demo
             ./odoobin -f db reset
             ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
           else
+            echo "Testing all files"
             ./odoobin -f robot run-all --timeout ${{ inputs.timeout }}
           fi
 
