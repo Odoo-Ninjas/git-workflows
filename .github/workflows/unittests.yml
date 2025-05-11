@@ -12,6 +12,10 @@ on:
       enabled:
         required: true
         type: string
+      testfile:
+        type: string
+        required: false
+
 jobs:
   run_tests:
     runs-on:
@@ -36,12 +40,19 @@ jobs:
           build: ${{ inputs.enabled }}
           project_name_prefix: ${{ inputs.projectname}}_unittests
 
-      - name: run tests
+      - name: run tests for ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
         run: |
-          ./odoobin up -d postgres || true
-          ./odoobin up -d postgres
-          ./odoobin -f run-tests
+          if ${{ inputs.testfile }}
+            ./odoobin -f reload --demo
+            ./odoobin -f db reset
+            ./odoobin -f up -d postgres
+            ./odoobin -f unit "${{ inputs.testfile}}"
+          else
+            ./odoobin up -d postgres || true
+            ./odoobin up -d postgres
+            ./odoobin -f run-tests
+          fi
 
       - name: cleanup docker
         if: always()
