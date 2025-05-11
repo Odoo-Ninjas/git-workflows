@@ -21,9 +21,6 @@ jobs:
     runs-on:
       - self-hosted
       # - marc-laptop
-    concurrency:
-      group: unittests-${{ github.workflow }}-${{ github.ref }}-unittests
-      cancel-in-progress: true
 
     steps:
       - name: Welcome robotests
@@ -48,6 +45,8 @@ jobs:
             ./odoobin -f reload --demo
             ./odoobin -f db reset
             ./odoobin -f up -d postgres
+            module=$(dirname "$(dirname "${{ inputs.testfile }}")")
+            ./odoobin update "$module"
             ./odoobin -f unit "${{ inputs.testfile }}"
           else
             echo "Testing all files"
