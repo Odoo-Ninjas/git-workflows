@@ -17,6 +17,9 @@ on:
         required: false
         type: number
         default: 140
+      testfile:
+        required: false
+        type: string
 
 jobs:
   build:
@@ -38,10 +41,16 @@ jobs:
           enabled: ${{ inputs.enabled }}
           project_name_prefix: ${{ inputs.projectname}}_robotests
 
-      - name: run robo tests
+      - name: run robo tests for (if empty then all) ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
         run: |
-          ./odoobin -f robot run-all --timeout ${{ inputs.timeout }}
+          if ${{ inputs.testfile }}
+            ./odoobin -f reload --demo
+            ./odoobin -f db reset
+            ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
+          else
+            ./odoobin -f robot run-all --timeout ${{ inputs.timeout }}
+          fi
 
       - name: cleanup docker
         if: always()
