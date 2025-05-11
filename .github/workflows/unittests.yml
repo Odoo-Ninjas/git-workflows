@@ -43,7 +43,7 @@ jobs:
       - name: run tests for ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
         run: |
-          if ${{ inputs.testfile }}
+          if ${{ inputs.testfile }}; then
             ./odoobin -f reload --demo
             ./odoobin -f db reset
             ./odoobin -f up -d postgres

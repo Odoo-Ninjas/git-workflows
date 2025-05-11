@@ -44,7 +44,7 @@ jobs:
       - name: run robo tests for (if empty then all) ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
         run: |
-          if ${{ inputs.testfile }}
+          if ${{ inputs.testfile }}; then
             ./odoobin -f reload --demo
             ./odoobin -f db reset
             ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
