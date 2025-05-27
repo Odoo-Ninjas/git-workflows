@@ -42,6 +42,7 @@ jobs:
         if: ${{ inputs.enabled }}
         shell: bash -l {0}
         run: |
+          pwd
           if [[ ! -z "${{ inputs.testfile }};" ]] then
             echo "Running unittest for ${{ inputs.testfile }};"
             ./odoobin -f reload --demo

@@ -104,6 +104,8 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
+        set -ex
+        pwd
         echo "Reloading odoo with settings"
         echo "::group::reloading"
         ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
@@ -121,6 +123,7 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
+        pwd
         echo "::group::build"
         ./odoobin build -p > ./odoo-build-out
         echo "::endgroup::"
