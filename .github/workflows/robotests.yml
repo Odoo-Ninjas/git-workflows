@@ -39,6 +39,7 @@ jobs:
 
       - name: run robo tests for (if empty then all) ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
+        shell: bash -l {0}
         run: |
           if [[ ! -z "${{ inputs.testfile }};" ]] then
             echo "Running unittest for ${{ inputs.testfile }};"
@@ -52,6 +53,7 @@ jobs:
 
       - name: cleanup docker
         if: always()
+        shell: bash -l {0}
         run: |
           if "${{ inputs.enabled }}"; then
             ./odoobin -f kill || true

@@ -24,8 +24,9 @@ jobs:
 
     steps:
       - name: Welcome robotests
+        shell: bash -l {0}
         run: |
-          echo "Welcome to robotesting"
+          echo "Welcome to unit-testing"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +40,7 @@ jobs:
 
       - name: run tests for ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
+        shell: bash -l {0}
         run: |
           if [[ ! -z "${{ inputs.testfile }};" ]] then
             echo "Running unittest for ${{ inputs.testfile }};"
@@ -57,6 +59,7 @@ jobs:
 
       - name: cleanup docker
         if: always()
+        shell: bash -l {0}
         run: |
           if "${{ inputs.ENABLED }}"; then
             ./odoobin -f kill
