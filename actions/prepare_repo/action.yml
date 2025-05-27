@@ -59,7 +59,7 @@ runs:
 
         while (( attempt <= max_attempts ))
         do
-            if $HOME/.local/bin/gimera apply -f -r -C -v -P -I; then
+            if gimera apply -f -r -C -v -P -I; then
               echo "Success on attempt $attempt! Congrats."
               exit 0  # Exit script if the command is successful
             else
