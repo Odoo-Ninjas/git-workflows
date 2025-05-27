@@ -44,6 +44,7 @@ runs:
         set -ex
         which gimera
         which odoo
+        echo "::group::gimera"
 
         rm .gitignore
 
@@ -70,6 +71,7 @@ runs:
             ((attempt++))
             sleep "$random_wait_time"
         done
+        echo "::endgroup::"
         echo "Finished step fetch missing repos"
 
     - name: local odoo bin
@@ -103,6 +105,7 @@ runs:
       shell: bash -l {0}
       run: |
         echo "Reloading odoo with settings"
+        echo "::group::reloading"
         ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
         ./odoobin setting -R DEVMODE 1
         ./odoobin setting -R RUN_ROBOT 1
@@ -111,13 +114,16 @@ runs:
         ./odoobin setting -R RUN_PROXY_PUBLISHED=0
         ./odoobin setting -R RUN_PROXY_PORT 0
         ./odoobin reload --demo
+        echo "::endgroup::"
         echo "Done reloading"
 
     - name: build docker images
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
+        echo "::group::build"
         ./odoobin build -p > ./odoo-build-out
+        echo "::endgroup::"
 
     - name: downing
       if: ${{ inputs.enabled && inputs.build }}
