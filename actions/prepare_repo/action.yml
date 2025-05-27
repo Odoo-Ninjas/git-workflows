@@ -91,7 +91,7 @@ runs:
 
         content = []
         content.append("#!/bin/bash")
-        content.append(f'$HOME/.local/bin/odoo -p {project_name} "\$@"')
+        content.append(f'odoo -p {project_name} "\$@"')
         Path("odoobin").write_text('\n'.join(content))
 
         EOF
