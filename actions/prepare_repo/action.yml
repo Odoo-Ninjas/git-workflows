@@ -42,6 +42,7 @@ runs:
       shell: bash -l {0}
       run: |
         set -ex
+        cd "$GITHUB_WORKSPACE"
         which gimera
         which odoo
         echo "::group::gimera"
@@ -78,6 +79,7 @@ runs:
       if: ${{ inputs.enabled }}
       shell: bash -l {0}
       run: |
+        cd "$GITHUB_WORKSPACE"
         echo "Creating local odoo bin"
         python3 <<EOF
 
@@ -105,7 +107,7 @@ runs:
       shell: bash -l {0}
       run: |
         set -ex
-        pwd
+        cd "$GITHUB_WORKSPACE"
         echo "Reloading odoo with settings"
         echo "::group::reloading"
         ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
@@ -123,7 +125,7 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
-        pwd
+        cd "$GITHUB_WORKSPACE"
         echo "::group::build"
         ./odoobin build -p > ./odoo-build-out
         echo "::endgroup::"
@@ -132,5 +134,6 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
+        cd "$GITHUB_WORKSPACE"
         ./odoobin -f down || true
         ./odoobin -f down
