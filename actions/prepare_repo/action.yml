@@ -42,6 +42,8 @@ runs:
       shell: bash -l {0}
       run: |
         set -ex
+        which gimera
+        which odoo
 
         rm .gitignore
 
