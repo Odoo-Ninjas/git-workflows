@@ -42,6 +42,7 @@ jobs:
         shell: bash -l {0}
         run: |
           set -x
+          echo "Version Robo 1.0"
           cd "$GITHUB_WORKSPACE"
           if [[ ! -z "${{ inputs.testfile }};" ]] then
             echo "Running unittest for ${{ inputs.testfile }};"
