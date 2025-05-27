@@ -117,7 +117,7 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
-        ./odoobin build -rm
+        ./odoobin build -p
 
     - name: downing
       if: ${{ inputs.enabled && inputs.build }}
