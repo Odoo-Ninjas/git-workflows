@@ -41,6 +41,7 @@ jobs:
         if: ${{ inputs.enabled }}
         shell: bash -l {0}
         run: |
+          set -x
           cd "$GITHUB_WORKSPACE"
           if [[ ! -z "${{ inputs.testfile }};" ]] then
             echo "Running unittest for ${{ inputs.testfile }};"
@@ -56,6 +57,7 @@ jobs:
         if: always()
         shell: bash -l {0}
         run: |
+          set -x
           cd "$GITHUB_WORKSPACE"
           if "${{ inputs.enabled }}"; then
             ./odoobin -f kill || true
