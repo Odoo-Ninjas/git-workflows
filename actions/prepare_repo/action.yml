@@ -39,7 +39,7 @@ runs:
 
     - name: fetch missing repos
       if: ${{ inputs.enabled }}
-      shell: bash
+      shell: bash -l {0}
       run: |
         set -ex
 
@@ -72,7 +72,7 @@ runs:
 
     - name: local odoo bin
       if: ${{ inputs.enabled }}
-      shell: bash
+      shell: bash -l {0}
       run: |
         echo "Creating local odoo bin"
         python3 <<EOF
@@ -98,7 +98,7 @@ runs:
 
     - name: reload
       if: ${{ inputs.enabled && inputs.build }}
-      shell: bash
+      shell: bash -l {0}
       run: |
         echo "Reloading odoo with settings"
         ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
@@ -113,13 +113,13 @@ runs:
 
     - name: build docker images
       if: ${{ inputs.enabled && inputs.build }}
-      shell: bash
+      shell: bash -l {0}
       run: |
         ./odoobin build -rm
 
     - name: downing
       if: ${{ inputs.enabled && inputs.build }}
-      shell: bash
+      shell: bash -l {0}
       run: |
         ./odoobin -f down || true
         ./odoobin -f down
