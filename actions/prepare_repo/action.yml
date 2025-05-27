@@ -30,6 +30,7 @@ runs:
     - name: setup gimera and wodoo
       shell: bash
       run: |
+        python -m pip install --upgrade pipx
         pipx install wodoo --force || true
         pipx install gimera --force || true
         pipx upgrade wodoo || true
