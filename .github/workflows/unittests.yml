@@ -15,6 +15,10 @@ on:
       testfile:
         type: string
         required: false
+      timeout_minutes:
+        type: number
+        required: false
+        default: 20
 
 jobs:
   run_tests:
@@ -22,6 +26,7 @@ jobs:
       - self-hosted
       # - marc-laptop
 
+    timeout-minutes: ${{ inputs.timeout_minutes }}
     steps:
       - name: Welcome robotests
         shell: bash -l {0}
