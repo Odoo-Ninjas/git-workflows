@@ -127,7 +127,12 @@ runs:
       run: |
         cd "$GITHUB_WORKSPACE"
         echo "::group::build"
-        ./odoobin build -p
+        echo "Building - on error i will show the output log"
+        ./odoobin build -p > .build.log
+        status=$?
+        if [ $status -ne 0 ]; then
+          cat .build.log
+        fi
         echo "::endgroup::"
 
     - name: downing
