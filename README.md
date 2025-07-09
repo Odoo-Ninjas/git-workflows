@@ -25,3 +25,27 @@ jobs:
       projectname: myproject
 
 ```
+
+# Deploy to subversions (tip: use odoo-version-manager)
+
+```yaml
+
+name: Deploy fixes to other versions with rebase main
+
+on:
+  push:
+    branches:
+      - <current_branch>
+
+permissions: write-all
+
+jobs:
+  deploy-subversions:
+    uses: Odoo-Ninjas/git-workflows/.github/workflows/deploy_to_subversions.yml@v9
+    with:
+      branches: <mappings>
+    secrets:
+      SSH_PRIVATE_KEY:  ${{ secrets.SSH_PRIVATE_KEY }}
+
+
+```
