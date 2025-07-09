@@ -9,6 +9,10 @@ on:
         type: string
         # is an array like:
         # '15.0:main 16.0:main ||| 14.0:15.0'
+      runner_label:
+        required: false
+        type: string
+        default: "self-hosted"
         
     secrets:
       SSH_PRIVATE_KEY:
@@ -19,7 +23,7 @@ permissions: write-all
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: ${{ inputs.runner_label || 'self-hosted' }}
 
     steps:
     - uses: actions/checkout@v4
