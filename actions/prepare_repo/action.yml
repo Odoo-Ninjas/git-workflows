@@ -114,7 +114,7 @@ runs:
         ./odoobin setting -R DEVMODE 1
         ./odoobin setting -R RUN_ROBOT 1
         ./odoobin setting -R RUN_MAIL 0
-        ./odoobin setting -R ODOO_PYTHON_VERSION "$ODOO_PYTHON_VERSION"
+        ./odoobin setting -R ODOO_PYTHON_VERSION="$ODOO_PYTHON_VERSION"
         ./odoobin setting -R RUN_PROXY_PUBLISHED=0
         ./odoobin setting -R RUN_PROXY_PORT 0
         ./odoobin reload --demo
