@@ -125,15 +125,14 @@ runs:
       if: ${{ inputs.enabled && inputs.build }}
       shell: bash -l {0}
       run: |
+        set -o pipefail
         cd "$GITHUB_WORKSPACE"
         echo "::group::build"
         echo "Building - on error i will show the output log"
-        ./odoobin build -p > .build.log
-        status=$?
-        if [ $status -ne 0 ]; then
-          cat .build.log
-        fi
+        ./odoobin build -p 2>&1 | tee .build.log
+        status=${PIPESTATUS[0]}
         echo "::endgroup::"
+        exit $status
 
     - name: downing
       if: ${{ inputs.enabled && inputs.build }}
