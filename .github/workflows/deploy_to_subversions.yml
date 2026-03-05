@@ -98,10 +98,9 @@ jobs:
         import subprocess
         from copy import deepcopy
 
-        SRCBRANCH = "${{ inputs.source_branch }}"
         branches = "${{ inputs.branches }}"
 
-        print(f"Checking branches of SRCBRANCH: {SRCBRANCH} and branches: {branches}")
+        print(f"Checking branches: {branches}")
 
         for area in branches.split("|||"):
           area = area.strip()
@@ -113,7 +112,7 @@ jobs:
               continue
             try:
               dest, source = branch.strip().split(" ")
-            except:
+            except ValueError:
               raise Exception(f"Invalid format: {branch}")
             dest = dest.strip()
             source = source.strip()

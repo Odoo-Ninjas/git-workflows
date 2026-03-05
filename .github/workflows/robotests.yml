@@ -53,7 +53,7 @@ jobs:
           set -x
           echo "Version Robo 1.0"
           cd "$GITHUB_WORKSPACE"
-          if [[ ! -z "${{ inputs.testfile }};" ]] then
+          if [[ ! -z "${{ inputs.testfile }}" ]] then
             echo "Running unittest for ${{ inputs.testfile }};"
             ./odoobin -f reload --demo
             ./odoobin -f db reset
