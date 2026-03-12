@@ -30,17 +30,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Robotest Version New
-        shell: bash -l {0}
-        run: |
-          echo "Hello Newbie"
-          env
-          echo "------------------"
-          ls -lhtra
-
-
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.3
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}

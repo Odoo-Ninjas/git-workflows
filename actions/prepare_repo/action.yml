@@ -22,20 +22,6 @@ env:
 runs:
   using: "composite"
   steps:
-    #- name: Set up Python 3.12
-    #  uses: actions/setup-python@v5
-    #  with:
-    #    python-version: "3.12"
-
-    #- name: setup gimera and wodoo
-    #  shell: bash
-    #  run: |
-    #    #python -m pip install --upgrade pipx
-    #    #pipx install wodoo --force || true
-    #    #pipx install gimera --force || true
-    #    #pipx upgrade wodoo || true
-    #    #pipx upgrade gimera || true
-    #    echo  setup wodoo and gimera on your own please
 
     - name: fetch missing repos
       if: ${{ inputs.enabled }}
@@ -111,12 +97,13 @@ runs:
         echo "Reloading odoo with settings"
         echo "::group::reloading"
         ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
-        ./odoobin setting -R DEVMODE 1
-        ./odoobin setting -R RUN_ROBOT 1
-        ./odoobin setting -R RUN_MAIL 0
+        ./odoobin setting -R DEVMODE=1
+        ./odoobin setting -R RUN_ROBOT=1
+        ./odoobin setting -R RUN_CRONJOBS=1
+        ./odoobin setting -R RUN_MAIL=0
         ./odoobin setting -R ODOO_PYTHON_VERSION="$ODOO_PYTHON_VERSION"
         ./odoobin setting -R RUN_PROXY_PUBLISHED=0
-        ./odoobin setting -R RUN_PROXY_PORT 0
+        ./odoobin setting -R RUN_PROXY_PORT=0
         ./odoobin reload --demo
         echo "::endgroup::"
         echo "Done reloading"
