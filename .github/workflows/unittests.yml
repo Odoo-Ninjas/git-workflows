@@ -72,5 +72,5 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           if "${{ inputs.enabled }}"; then
             ./odoobin -f kill
-            ./odoobin -f down -v
+            ./odoobin -f down -v --cleanup-files  || true
           fi
