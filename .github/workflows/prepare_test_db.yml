@@ -21,6 +21,10 @@ on:
         type: string
         required: false
         description: "Additional modules to install on top of MANIFEST['install'] (e.g. 'robot_utils crm sale_management')"
+      uninstall_modules:
+        type: string
+        required: false
+        description: "Space-separated modules to uninstall before backup (e.g. 'partner_autocomplete')"
       shared_dir:
         type: string
         required: true
@@ -35,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.11
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.12
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
@@ -66,6 +70,10 @@ jobs:
           MODULES="$MODULES ${{ inputs.extra_modules }}"
           echo "Installing modules: $MODULES"
           ./odoobin update $MODULES
+          if [[ ! -z "${{ inputs.uninstall_modules }}" ]]; then
+            echo "Uninstalling modules: ${{ inputs.uninstall_modules }}"
+            ./odoobin uninstall ${{ inputs.uninstall_modules }}
+          fi
           mkdir -p "${{ inputs.shared_dir }}"
           ./odoobin backup odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz"
 
