@@ -54,7 +54,7 @@ jobs:
               echo "Restoring database from prepared dump"
               ./odoobin setting -R RUN_CRONJOBSHELL=1
               ./odoobin -f reload --demo
-              ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz"
+              ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz" --no-dev-scripts
               ./odoobin robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
             else
               ./odoobin -f reload --demo
