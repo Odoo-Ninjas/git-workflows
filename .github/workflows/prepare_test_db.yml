@@ -1,5 +1,5 @@
 # https://docs.github.com/en/actions/using-workflows/reusing-workflows
-name: Run Robotests for repository
+name: Prepare test database
 
 permissions: write-all
 
@@ -16,18 +16,18 @@ on:
       timeout:
         required: false
         type: number
-        default: 140
-      testfile:
-        required: false
+        default: 60
+      modules:
         type: string
+        required: true
+        description: "Space-separated list of modules to pre-install"
       shared_dir:
-        required: false
         type: string
-        description: "Path to shared directory with prepared database dump"
+        required: true
+        description: "Path to shared directory for storing the database dump"
 
 jobs:
-  build:
-
+  prepare:
     runs-on: self-hosted
     timeout-minutes: ${{ inputs.timeout }}
     steps:
@@ -39,28 +39,25 @@ jobs:
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
-          project_name_prefix: ${{ inputs.projectname}}_robotests
+          project_name_prefix: ${{ inputs.projectname }}_prepare_db
 
-      - name: run robo tests for (if empty then all) ${{ inputs.testfile }}
+      - name: prepare database with modules ${{ inputs.modules }}
         if: ${{ inputs.enabled }}
         shell: bash -l {0}
         run: |
           set -x
-          echo "Version Robo 1.0"
           cd "$GITHUB_WORKSPACE"
-          if [[ ! -z "${{ inputs.testfile }}" ]]; then
-            if [[ ! -z "${{ inputs.shared_dir }}" ]]; then
-              echo "Restoring database from prepared dump"
-              ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz"
-            else
-              ./odoobin -f reload --demo
-              ./odoobin -f db reset
-            fi
-            ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
-          else
-            echo "Testing all files"
-            ./odoobin -f robot run-all --timeout ${{ inputs.timeout }}
-          fi
+          ./odoobin -f reload --demo
+          ./odoobin -f db reset
+          ./odoobin update ${{ inputs.modules }}
+          mkdir -p "${{ inputs.shared_dir }}"
+          ./odoobin backup odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz"
+
+      - name: cleanup old dumps
+        if: always()
+        shell: bash -l {0}
+        run: |
+          find "${{ inputs.shared_dir }}" -name "*.dump.gz" -mtime +3 -delete || true
 
       - name: cleanup docker
         if: always()
@@ -70,5 +67,5 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           if "${{ inputs.enabled }}"; then
             ./odoobin -f kill || true
-            ./odoobin -f down -v --cleanup-files  || true
+            ./odoobin -f down -v --cleanup-files || true
           fi
