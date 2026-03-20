@@ -80,7 +80,7 @@ runs:
         project_name = hashlib.sha256(project_name.encode()).hexdigest()[:20]
 
         content = []
-        content.append("#!/bin/bash")
+        content.append("#!/bin/bash -l")
         content.append(f'odoo -p {project_name} "\$@"')
         Path("odoobin").write_text('\n'.join(content))
 
