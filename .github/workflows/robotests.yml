@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.8
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.9
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
@@ -51,6 +51,8 @@ jobs:
           if [[ ! -z "${{ inputs.testfile }}" ]]; then
             if [[ ! -z "${{ inputs.shared_dir }}" ]]; then
               echo "Restoring database from prepared dump"
+              ./odoobin setting -R RUN_CRONJOBSHELL=1
+              ./odoobin -f reload --demo
               ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz"
             else
               ./odoobin -f reload --demo

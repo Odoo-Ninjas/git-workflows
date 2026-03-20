@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.8
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.9
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
@@ -47,6 +47,7 @@ jobs:
         run: |
           set -x
           cd "$GITHUB_WORKSPACE"
+          ./odoobin setting -R RUN_CRONJOBSHELL=1
           ./odoobin -f reload --demo
           ./odoobin build
           ./odoobin -f db reset
