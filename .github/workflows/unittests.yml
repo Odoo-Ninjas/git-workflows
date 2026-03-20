@@ -19,6 +19,10 @@ on:
         type: number
         required: false
         default: 20
+      shared_dir:
+        required: false
+        type: string
+        description: "Path to shared directory with cached sources"
 
 jobs:
   run_tests:
@@ -37,11 +41,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.13
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.14
         with:
           enabled: ${{ inputs.enabled }}
           build: ${{ inputs.enabled }}
           project_name_prefix: ${{ inputs.projectname}}_unittests
+          cached_sources_dir: ${{ inputs.shared_dir && format('{0}/sources/{1}', inputs.shared_dir, github.sha) || '' }}
 
       - name: run tests for ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}
