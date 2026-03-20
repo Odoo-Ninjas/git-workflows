@@ -35,11 +35,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.10
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.11
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
           project_name_prefix: ${{ inputs.projectname}}_robotests
+          cached_sources_dir: ${{ inputs.shared_dir && format('{0}/sources/{1}', inputs.shared_dir, github.sha) || '' }}
 
       - name: run robo tests for (if empty then all) ${{ inputs.testfile }}
         if: ${{ inputs.enabled }}

@@ -13,6 +13,10 @@ inputs:
     type: boolean
     default: "1"
     required: false
+  cached_sources_dir:
+    type: string
+    required: false
+    description: "Path to cached sources directory. If set, rsync from there instead of running gimera."
 
 env:
   GIMERA_NON_THREADED: 1
@@ -23,8 +27,19 @@ runs:
   using: "composite"
   steps:
 
+    - name: restore cached sources
+      if: ${{ inputs.enabled && inputs.cached_sources_dir != '' }}
+      shell: bash -l {0}
+      run: |
+        set -ex
+        cd "$GITHUB_WORKSPACE"
+        echo "::group::restore cached sources"
+        echo "Syncing sources from ${{ inputs.cached_sources_dir }}"
+        rsync -a --delete --exclude='.git' "${{ inputs.cached_sources_dir }}/" ./
+        echo "::endgroup::"
+
     - name: fetch missing repos
-      if: ${{ inputs.enabled }}
+      if: ${{ inputs.enabled && inputs.cached_sources_dir == '' }}
       shell: bash -l {0}
       run: |
         set -ex
