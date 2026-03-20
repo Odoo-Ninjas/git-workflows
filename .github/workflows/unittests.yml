@@ -49,8 +49,8 @@ jobs:
         run: |
           set -x
           cd "$GITHUB_WORKSPACE"
-          if [[ ! -z "${{ inputs.testfile }};" ]] then
-            echo "Running unittest for ${{ inputs.testfile }};"
+          if [[ ! -z "${{ inputs.testfile }}" ]]; then
+            echo "Running unittest for ${{ inputs.testfile }}"
             ./odoobin -f reload --demo
             ./odoobin -f db reset
             ./odoobin -f up -d postgres
