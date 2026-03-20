@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.12
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.13
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
@@ -55,11 +55,12 @@ jobs:
               ./odoobin setting -R RUN_CRONJOBSHELL=1
               ./odoobin -f reload --demo
               ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz"
+              ./odoobin robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
             else
               ./odoobin -f reload --demo
               ./odoobin -f db reset
+              ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
             fi
-            ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
           else
             echo "Testing all files"
             ./odoobin -f robot run-all --timeout ${{ inputs.timeout }}
