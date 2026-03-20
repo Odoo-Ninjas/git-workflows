@@ -120,6 +120,8 @@ runs:
         ./odoobin setting -R ODOO_PYTHON_VERSION="$ODOO_PYTHON_VERSION"
         ./odoobin setting -R RUN_PROXY_PUBLISHED=0
         ./odoobin setting -R RUN_PROXY_PORT=0
+        ./odoobin setting -R RUN_LOGS=0
+        ./odoobin setting -R RUN_REDIS=0
         ./odoobin setting -R ODOO_DEMO=1
         ./odoobin reload --demo
         echo "::endgroup::"
