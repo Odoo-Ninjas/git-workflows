@@ -111,6 +111,7 @@ runs:
         cd "$GITHUB_WORKSPACE"
         echo "Reloading odoo with settings"
         echo "::group::reloading"
+        ./odoobin fix-perm ~/.odoo
         ODOO_PYTHON_VERSION=$(python3 -c 'from pathlib import Path; print(eval(Path("MANIFEST").read_text())["python_version"])')
         ./odoobin setting -R DEVMODE=1
         ./odoobin setting -R RUN_ROBOT=1

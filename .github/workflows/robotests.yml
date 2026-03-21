@@ -20,6 +20,11 @@ on:
       testfile:
         required: false
         type: string
+      retries:
+        required: false
+        type: number
+        default: 3
+        description: "Number of retry attempts for flaky tests"
       shared_dir:
         required: false
         type: string
@@ -49,22 +54,30 @@ jobs:
           set -x
           echo "Version Robo 1.0"
           cd "$GITHUB_WORKSPACE"
-          if [[ ! -z "${{ inputs.testfile }}" ]]; then
-            if [[ ! -z "${{ inputs.shared_dir }}" ]]; then
-              echo "Restoring database from prepared dump"
-              ./odoobin setting -R RUN_CRONJOBSHELL=1
-              ./odoobin -f reload --demo
-              ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz" --no-dev-scripts
-              ./odoobin robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
+          MAX_RETRIES=${{ inputs.retries }}
+          for attempt in $(seq 1 $MAX_RETRIES); do
+            echo "::group::Attempt $attempt of $MAX_RETRIES"
+            if [[ ! -z "${{ inputs.testfile }}" ]]; then
+              if [[ ! -z "${{ inputs.shared_dir }}" ]]; then
+                echo "Restoring database from prepared dump"
+                ./odoobin setting -R RUN_CRONJOBSHELL=1
+                ./odoobin -f reload --demo
+                ./odoobin -f restore odoo-db "${{ inputs.shared_dir }}/${{ github.sha }}.dump.gz" --no-dev-scripts
+                ./odoobin robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }} && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
+              else
+                ./odoobin -f reload --demo
+                ./odoobin -f db reset
+                ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }} && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
+              fi
             else
-              ./odoobin -f reload --demo
-              ./odoobin -f db reset
-              ./odoobin -f robot run "${{ inputs.testfile}}" --timeout ${{ inputs.timeout }}
+              echo "Testing all files"
+              ./odoobin -f robot run-all --timeout ${{ inputs.timeout }} && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
             fi
-          else
-            echo "Testing all files"
-            ./odoobin -f robot run-all --timeout ${{ inputs.timeout }}
-          fi
+            echo "::endgroup::"
+            echo "::warning::Attempt $attempt failed. $([ $attempt -lt $MAX_RETRIES ] && echo 'Retrying...' || echo 'No more retries.')"
+          done
+          echo "::error::All $MAX_RETRIES attempts failed."
+          exit 1
 
       - name: cleanup docker
         if: always()

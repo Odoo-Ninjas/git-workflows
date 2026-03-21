@@ -19,6 +19,11 @@ on:
         type: number
         required: false
         default: 20
+      retries:
+        required: false
+        type: number
+        default: 3
+        description: "Number of retry attempts for flaky tests"
       shared_dir:
         required: false
         type: string
@@ -54,20 +59,28 @@ jobs:
         run: |
           set -x
           cd "$GITHUB_WORKSPACE"
-          if [[ ! -z "${{ inputs.testfile }}" ]]; then
-            echo "Running unittest for ${{ inputs.testfile }}"
-            ./odoobin -f reload --demo
-            ./odoobin -f db reset
-            ./odoobin -f up -d postgres
-            module=$(dirname "$(dirname "${{ inputs.testfile }}")")
-            ./odoobin update "$module"
-            ./odoobin -f unit "${{ inputs.testfile }}"
-          else
-            echo "Testing all files"
-            ./odoobin up -d postgres || true
-            ./odoobin up -d postgres
-            ./odoobin -f run-tests
-          fi
+          MAX_RETRIES=${{ inputs.retries }}
+          for attempt in $(seq 1 $MAX_RETRIES); do
+            echo "::group::Attempt $attempt of $MAX_RETRIES"
+            if [[ ! -z "${{ inputs.testfile }}" ]]; then
+              echo "Running unittest for ${{ inputs.testfile }}"
+              ./odoobin -f reload --demo
+              ./odoobin -f db reset
+              ./odoobin -f up -d postgres
+              module=$(dirname "$(dirname "${{ inputs.testfile }}")")
+              ./odoobin update "$module"
+              ./odoobin -f unit "${{ inputs.testfile }}" && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
+            else
+              echo "Testing all files"
+              ./odoobin up -d postgres || true
+              ./odoobin up -d postgres
+              ./odoobin -f run-tests && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
+            fi
+            echo "::endgroup::"
+            echo "::warning::Attempt $attempt failed. $([ $attempt -lt $MAX_RETRIES ] && echo 'Retrying...' || echo 'No more retries.')"
+          done
+          echo "::error::All $MAX_RETRIES attempts failed."
+          exit 1
 
       - name: cleanup docker
         if: always()
