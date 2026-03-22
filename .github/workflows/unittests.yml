@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.18
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.19
         with:
           enabled: ${{ inputs.enabled }}
           build: ${{ inputs.enabled }}
@@ -68,7 +68,7 @@ jobs:
               ./odoobin -f db reset
               ./odoobin -f up -d postgres
               module=$(dirname "$(dirname "${{ inputs.testfile }}")")
-              ./odoobin update "$module"
+              ./odoobin update "$module" > /dev/null 2>&1
               ./odoobin -f unit "${{ inputs.testfile }}" && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
             else
               echo "Testing all files"

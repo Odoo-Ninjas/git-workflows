@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: preparation steps
-        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.18
+        uses: Odoo-Ninjas/git-workflows/actions/prepare_repo@v9.19
         with:
           build: ${{ inputs.enabled }}
           enabled: ${{ inputs.enabled }}
@@ -56,12 +56,12 @@ jobs:
           ./odoobin setting -R DEVMODE=1
           ./odoobin setting -R RUN_PROXY_PUBLISHED=0
           ./odoobin -f reload --demo
-          ./odoobin build
+          ./odoobin build > /dev/null 2>&1
           ./odoobin -f db reset
           MODULES=$(python3 -c "from pathlib import Path; print(' '.join(eval(Path('MANIFEST').read_text())['install']))")
           MODULES="$MODULES ${{ inputs.extra_modules }}"
           echo "Installing modules: $MODULES"
-          ./odoobin update $MODULES > /dev/null
+          ./odoobin update $MODULES > /dev/null 2>&1
           echo "Update done. Log available at /update.log"
           if [[ ! -z "${{ inputs.uninstall_modules }}" ]]; then
             echo "Uninstalling modules: ${{ inputs.uninstall_modules }}"
