@@ -20,6 +20,7 @@ on:
       extra_modules:
         type: string
         required: false
+        default: "sale_stock stock stock_account"
         description: "Additional modules to install on top of MANIFEST['install'] (e.g. 'robot_utils crm sale_management')"
       uninstall_modules:
         type: string
