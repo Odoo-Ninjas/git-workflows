@@ -38,7 +38,6 @@ jobs:
     - name: setup ssh
       run: |
         mkdir -p ~/.ssh || exit 0
-        chmod 600 ~/.ssh/id_rsa
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 400 ~/.ssh/id_rsa
         chmod 500 ~/.ssh
@@ -111,7 +110,7 @@ jobs:
             if not branch:
               continue
             try:
-              dest, source = branch.strip().split(" ")
+              dest, source = branch.strip().split(":")
             except ValueError:
               raise Exception(f"Invalid format: {branch}")
             dest = dest.strip()
