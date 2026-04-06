@@ -68,6 +68,31 @@ jobs:
           echo "::endgroup::"
           echo "Finished gimera apply"
 
+      - name: checkout matching submodule branches for feature branches
+        if: ${{ inputs.enabled }}
+        shell: bash -l {0}
+        run: |
+          set -ex
+          cd "$GITHUB_WORKSPACE"
+          current_branch="${GITHUB_REF#refs/heads/}"
+
+          # skip for version branches (19.0, 18.0, ...) and main
+          if python -c "float('$current_branch')" 2>/dev/null || [ "$current_branch" = "main" ]; then
+            echo "Version or main branch - skipping submodule branch checkout"
+            exit 0
+          fi
+
+          # for each submodule, try to checkout the matching branch
+          git submodule foreach --quiet '
+            if git ls-remote --heads origin "'"$current_branch"'" | grep -q "'"$current_branch"'"; then
+              echo "Checking out submodule $name branch: '"$current_branch"'"
+              git fetch origin "'"$current_branch"'"
+              git checkout "'"$current_branch"'"
+            else
+              echo "No matching branch for $name: '"$current_branch"'"
+            fi
+          '
+
       - name: cache sources to shared dir
         if: ${{ inputs.enabled }}
         shell: bash -l {0}
