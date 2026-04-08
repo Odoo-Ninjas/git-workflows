@@ -70,7 +70,7 @@ jobs:
 
       - name: checkout matching submodule branches for feature branches
         if: ${{ inputs.enabled }}
-        shell: bash -l {0}
+        shell: bash {0}
         run: |
           set -ex
           cd "$GITHUB_WORKSPACE"
