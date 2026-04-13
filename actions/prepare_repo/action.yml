@@ -147,4 +147,4 @@ runs:
       run: |
         cd "$GITHUB_WORKSPACE"
         ./odoobin -f down || true
-        ./odoobin -f down
+        ./odoobin -f down || true
