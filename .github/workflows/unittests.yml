@@ -72,6 +72,10 @@ jobs:
               ./odoobin -f unit "${{ inputs.testfile }}" && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
             else
               echo "Testing all files"
+              if [ $attempt -gt 1 ]; then
+                ./odoobin -f kill || true
+                ./odoobin -f down || true
+              fi
               ./odoobin up -d postgres || true
               ./odoobin up -d postgres
               ./odoobin -f run-tests && { echo "::endgroup::"; echo "Tests passed on attempt $attempt"; exit 0; }
