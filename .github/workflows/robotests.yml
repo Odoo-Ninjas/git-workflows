@@ -57,6 +57,10 @@ jobs:
           MAX_RETRIES=${{ inputs.retries }}
           for attempt in $(seq 1 $MAX_RETRIES); do
             echo "::group::Attempt $attempt of $MAX_RETRIES"
+            if [ $attempt -gt 1 ]; then
+              ./odoobin -f kill || true
+              ./odoobin -f down || true
+            fi
             if [[ ! -z "${{ inputs.testfile }}" ]]; then
               if [[ ! -z "${{ inputs.shared_dir }}" ]]; then
                 echo "Restoring database from prepared dump"
