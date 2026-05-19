@@ -37,10 +37,14 @@ jobs:
 
     - name: setup ssh
       run: |
-        mkdir -p ~/.ssh || exit 0
+        # Self-hosted runners share $HOME between jobs. Use 600 (rw-)
+        # instead of 400 (r--) so a follow-up run can still truncate the
+        # file; chmod 700 on ~/.ssh keeps file create/delete possible.
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        rm -f ~/.ssh/id_rsa
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 400 ~/.ssh/id_rsa
-        chmod 500 ~/.ssh
+        chmod 600 ~/.ssh/id_rsa
         cat .git/config
 
     - name: setup default name / email
