@@ -54,6 +54,11 @@ jobs:
           set -x
           echo "Version Robo 1.0"
           cd "$GITHUB_WORKSPACE"
+          # Der Monitoring-Stack (grafana/prometheus/loki/alloy/cadvisor + exporter)
+          # wird fuer Testlaeufe nicht gebraucht und macht ~9 von 17 Containern je
+          # Instanz aus; die loki-/prometheus-Volumes waren der groesste Platzfresser
+          # auf dem Runner.
+          ./odoobin setting -R RUN_DASHBOARD=0
           MAX_RETRIES=${{ inputs.retries }}
           for attempt in $(seq 1 $MAX_RETRIES); do
             echo "::group::Attempt $attempt of $MAX_RETRIES"
