@@ -59,6 +59,8 @@ jobs:
         run: |
           set -x
           cd "$GITHUB_WORKSPACE"
+          # siehe robotests.yml: Monitoring-Stack in Testlaeufen abschalten
+          ./odoobin setting -R RUN_DASHBOARD=0
           MAX_RETRIES=${{ inputs.retries }}
           for attempt in $(seq 1 $MAX_RETRIES); do
             echo "::group::Attempt $attempt of $MAX_RETRIES"

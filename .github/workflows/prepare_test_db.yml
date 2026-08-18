@@ -56,6 +56,8 @@ jobs:
           ./odoobin setting -R RUN_CRONJOBSHELL=1
           ./odoobin setting -R DEVMODE=1
           ./odoobin setting -R RUN_PROXY_PUBLISHED=0
+          # siehe robotests.yml: Monitoring-Stack in Testlaeufen abschalten
+          ./odoobin setting -R RUN_DASHBOARD=0
           ./odoobin -f reload --demo
           ./odoobin build > /dev/null 2>&1
           ./odoobin -f db reset
